@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: webpage
+  name: webpage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webpage
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webpage
+    spec:
+      containers:
+      - image: setthapong/webpage
+        name: webpage
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webpage-s
+spec:
+  type: NodePort
+  selector:
+    app: webpage
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30008
+

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: box
+  labels:
+    app: box
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: box
+  template:
+    metadata:
+      labels:
+        app: box
+    spec:
+      containers:
+      - name: box
+        image: setthapong/box
+        ports:
+        - containerPort: 4200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: box-s
+  labels:
+    app: box
+spec:
+  type: NodePort
+  selector:
+    app: box
+  ports:
+  - port: 4200
+    targetPort: 4200
+    nodePort: 30420
+
