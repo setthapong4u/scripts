@@ -29,6 +29,9 @@ sudo apt-get update
 echo "install docker"
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
+echo "add current user to docker group"
+sudo usermod -aG docker $USER
+
 echo "All steps completed successfully!"
 
 #END of script
