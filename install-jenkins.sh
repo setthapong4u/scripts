@@ -4,7 +4,7 @@ echo "Updating system packages..."
 sudo apt update -y
 
 echo "Installing Java..."
-sudo apt install openjdk-11-jdk -y
+sudo apt install openjdk-17-jdk -y
 
 echo "Adding Jenkins repository key..."
 curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
