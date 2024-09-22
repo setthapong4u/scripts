@@ -26,6 +26,7 @@ EOF'
 # Install kubeadm, kubelet, kubectl
 sudo apt-get update -y
 sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
 
 # Disable swap 
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
