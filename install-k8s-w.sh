@@ -39,3 +39,4 @@ read -p "Enter the discovery-token-ca-cert-hash (sha256:<hash>): " CA_CERT_HASH
 sudo kubeadm join ${CONTROL_PLANE_IP}:6443 --token ${TOKEN} --discovery-token-ca-cert-hash ${CA_CERT_HASH} --cri-socket /run/containerd/containerd.sock
 
 echo "Worker node has successfully joined the Kubernetes cluster"
+#kubectl label node k-w node-role.kubernetes.io/worker=
