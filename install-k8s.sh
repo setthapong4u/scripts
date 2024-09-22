@@ -33,7 +33,7 @@ sudo sed -i '/ swap / s/^/#/' /etc/fstab
 sudo swapoff -a
 
 # kubeadm start
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/containerd/containerd.sock
+sudo kubeadm init --pod-network-cidr=10.224.0.0/16 --cri-socket /run/containerd/containerd.sock
 
 # Set up kubeconfig 
 mkdir -p $HOME/.kube
