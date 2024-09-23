@@ -59,3 +59,4 @@ if [ $? -eq 0 ]; then
 else
     echo "Kubeadm init failed. Please check the logs and resolve any issues."
 fi
+# curl -s https://raw.githubusercontent.com/setthapong4u/install-scripts/main/install-k8s-m.sh | bash
