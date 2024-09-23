@@ -36,7 +36,7 @@ sudo systemctl start chrony
 
 # Step 5: Install Docker
 echo "Installing Docker..."
-sudo install -m 0755 -d /etc/apt/keyrings
+sudo install -m 0755 -d /etc/apt/keyrings  # Only keep this line
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
@@ -54,13 +54,15 @@ sudo systemctl enable docker
 # Add current user to the Docker group (optional)
 sudo usermod -aG docker $USER
 
-# Step 6: Install Kubernetes (Kubeadm, Kubelet, Kubectl) version 1.29
+# Step 6: Install Kubernetes (Kubeadm, Kubelet, Kubectl) version 1.29 using the new repository
 echo "Installing Kubernetes version 1.29..."
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes-archive-keyring.gpg > /dev/null
 
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# Set up the Kubernetes repository with the new URL and key
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+# Update package list and install Kubernetes v1.29
 sudo apt-get update -y
 sudo apt-get install -y kubelet=1.29.0-00 kubeadm=1.29.0-00 kubectl=1.29.0-00
 
@@ -92,5 +94,6 @@ kubelet --version
 kubectl version --client
 
 echo "To add worker nodes to this Kubernetes cluster, use the kubeadm join command that was displayed after the kubeadm init step."
+
 
 # curl -s https://raw.githubusercontent.com/setthapong4u/install-scripts/main/docker-k8s.sh | bash
