@@ -44,7 +44,7 @@ echo "Installing apt-transport-https and curl..."
 sudo apt-get update
 sudo apt-get install -y apt-transport-https curl
 
-# Add Kubernetes GPG key for version 1.29
+# Add Kubernetes GPG key for version 1.29 and repo
 echo "Adding Kubernetes GPG key for version 1.29..."
 
 #curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
@@ -53,10 +53,10 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # Add Kubernetes repository for version 1.29
-echo "Adding Kubernetes repository for version 1.29..."
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
-EOF
+# echo "Adding Kubernetes repository for version 1.29..."
+# cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+#EOF
 
 # Update package lists and install Kubernetes components (version 1.29)
 echo "Installing Kubernetes components (kubelet, kubeadm, kubectl) version 1.29..."
