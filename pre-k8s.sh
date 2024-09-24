@@ -2,34 +2,8 @@
 
 # Function to install Docker
 install_docker() {
-  echo "Updating package list and installing required packages..."
-  sudo apt-get update
-  sudo apt-get install -y ca-certificates curl
-
-  echo "Creating keyrings directory for Docker..."
-  sudo install -m 0755 -d /etc/apt/keyrings
-
-  echo "Installing Docker GPG key..."
-  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-  sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-  echo "Adding Docker repository..."
-  echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-  echo "Updating package list..."
-  sudo apt-get update
-
-  echo "Installing Docker..."
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-  # Enable and start Docker service
-  sudo systemctl enable docker
-  sudo systemctl start docker
-
-  echo "Docker installation complete."
+  echo "Please exit and start again with containerd. Kubernetes officially deprecated Docker as a CRI starting from version 1.20"
+ 
 }
 
 # Function to install containerd
@@ -58,7 +32,7 @@ prompt_user_choice() {
       install_containerd
       break
     else
-      echo "Invalid choice. Please enter 1 or 2."
+      echo "Invalid choice. Please enter 2."
     fi
   done
 }
@@ -103,9 +77,12 @@ cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
+sudo sysctl net.ipv4.ip_forward=1
+sudo sh -c 'echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf'
 
 # Apply sysctl changes
 sudo sysctl --system
+sudo apt-get install -y socat
 
 # Disable swap as required by Kubernetes
 echo "Disabling swap..."
