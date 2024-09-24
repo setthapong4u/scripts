@@ -2,15 +2,29 @@
 
 # Function to install Docker
 install_docker() {
-  echo "Installing Docker..."
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  # Get the Ubuntu codename
+  UBUNTU_CODENAME=$(lsb_release -cs)
+
+  echo "Installing Docker GPG key..."
+  # Add the Docker GPG key to the keyrings directory
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /usr/share/keyrings/docker-archive-keyring.gpg > /dev/null
+
+  echo "Adding Docker repository..."
+  # Add Docker repository using the keyring
+  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $UBUNTU_CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  echo "Updating package list..."
+  # Update the package list to include the Docker repository
   sudo apt-get update
+
+  echo "Installing Docker..."
+  # Install Docker and related tools
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-  # Enable Docker services
+  # Enable and start Docker service
   sudo systemctl enable docker
   sudo systemctl start docker
+
   echo "Docker installation complete."
 }
 
