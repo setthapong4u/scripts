@@ -54,17 +54,17 @@ sudo systemctl enable docker
 # Add current user to the Docker group (optional)
 sudo usermod -aG docker $USER
 
-# Step 6: Install Kubernetes (Kubeadm, Kubelet, Kubectl) version 1.29 using the new repository
-echo "Installing Kubernetes version 1.29..."
+# Step 6: Install Kubernetes (Kubeadm, Kubelet, Kubectl) version 1.20
+echo "Installing Kubernetes version 1.20..."
 
 # Set up the Kubernetes repository with the new URL and key
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.20/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.20/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-# Update package list and install Kubernetes v1.29
+# Update package list and install Kubernetes v1.20
 sudo apt-get update -y
-sudo apt-get install -y kubelet=1.29.0-00 kubeadm=1.29.0-00 kubectl=1.29.0-00
+sudo apt-get install -y kubelet=1.20.0-00 kubeadm=1.20.0-00 kubectl=1.20.0-00
 
 # Prevent automatic updates to Kubernetes packages
 sudo apt-mark hold kubelet kubeadm kubectl
