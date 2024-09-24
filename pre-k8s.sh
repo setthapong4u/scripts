@@ -26,19 +26,23 @@ install_containerd() {
 }
 
 # Ask user to choose Docker or containerd
-echo "Choose container runtime:"
-echo "1) Docker"
-echo "2) Containerd"
-read -p "Enter choice [1-2]: " choice
+while true; do
+  echo "Choose container runtime:"
+  echo "1) Docker"
+  echo "2) Containerd"
+  read -p "Enter choice [1-2]: " choice
 
-if [[ "$choice" == "1" ]]; then
-  install_docker
-elif [[ "$choice" == "2" ]]; then
-  install_containerd
-else
-  echo "Invalid choice. Exiting."
-  exit 1
-fi
+  # Validate user input and break if valid
+  if [[ "$choice" == "1" ]]; then
+    install_docker
+    break
+  elif [[ "$choice" == "2" ]]; then
+    install_containerd
+    break
+  else
+    echo "Invalid choice. Please enter 1 or 2."
+  fi
+done
 
 # Add Kubernetes repo and install kubeadm, kubelet, kubectl
 echo "Installing Kubernetes components (kubeadm, kubelet, kubectl)..."
