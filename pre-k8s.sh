@@ -2,23 +2,27 @@
 
 # Function to install Docker
 install_docker() {
-  # Get the Ubuntu codename
-  UBUNTU_CODENAME=$(lsb_release -cs)
+  echo "Updating package list and installing required packages..."
+  sudo apt-get update
+  sudo apt-get install -y ca-certificates curl
+
+  echo "Creating keyrings directory for Docker..."
+  sudo install -m 0755 -d /etc/apt/keyrings
 
   echo "Installing Docker GPG key..."
-  # Add the Docker GPG key to the keyrings directory
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /usr/share/keyrings/docker-archive-keyring.gpg > /dev/null
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
 
   echo "Adding Docker repository..."
-  # Add Docker repository using the keyring
-  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $UBUNTU_CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
   echo "Updating package list..."
-  # Update the package list to include the Docker repository
   sudo apt-get update
 
   echo "Installing Docker..."
-  # Install Docker and related tools
   sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
   # Enable and start Docker service
@@ -62,11 +66,25 @@ prompt_user_choice() {
 # Call the function to prompt the user
 prompt_user_choice
 
-# Add Kubernetes repo and install kubeadm, kubelet, kubectl
-echo "Installing Kubernetes components (kubeadm, kubelet, kubectl)..."
-sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/kubernetes-archive-keyring.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# Load necessary kernel modules for containers and Kubernetes networking
+echo "Loading kernel modules..."
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Add Kubernetes repository
+echo "Creating keyrings directory for Kubernetes..."
+sudo mkdir -p /etc/apt/keyrings
+
+echo "Adding Kubernetes repository..."
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+echo "Installing Kubernetes GPG key..."
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo "Updating package list..."
 sudo apt-get update
+
+echo "Installing Kubernetes components (kubeadm, kubelet, kubectl)..."
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
@@ -78,6 +96,7 @@ sudo systemctl start kubelet
 echo "Configuring network settings for Kubernetes..."
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
+overlay
 EOF
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
