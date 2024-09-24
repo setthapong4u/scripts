@@ -90,6 +90,9 @@ sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 # Instructions to proceed with kubeadm init (for master node) or kubeadm join (for worker nodes)
+#kubectl edit configmap kube-proxy -n kube-system
+# config.conf > metricsBindAddress: "0.0.0.0:10256"
+#kubectl rollout restart ds/kube-proxy -n kube-system
 echo -e "\nInstallation complete. You can now initialize the master node with the following command:"
 echo "sudo kubeadm init --pod-network-cidr=10.244.0.0/16"
 echo "Or join a worker node using the kubeadm join command provided by the master node after initialization."
