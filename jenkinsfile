@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    environment {
+        SE_SAND_ACC = credentials('PRISMA_ACCESS_KEY')
+        SE_SAND_SEC = credentials('PRISMA_SECRET_KEY')
+        SE_SAND_PCC_URL = credentials('PCC_CONSOLE_URL')
+        PCC_CLS_ADD = credentials('PCC_CLS_JP')
+    }
+
+    stages {
+        stage('Prepare') {
+            steps {
+                sh '''
+                # Create a defender directory under the workspace
+                mkdir -p ${WORKSPACE}/.defender
+
+                # Set the permissions to allow sm user access
+                sudo chown -R sm:sm ${WORKSPACE}/.defender
+
+                # List the permissions of the created directory
+                ls -la ${WORKSPACE}
+                ls -la ${WORKSPACE}/.defender
+                '''
+            }
+        }
+
+        stage('Get Util') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'SE_SAND_ACC', variable: 'SE_SAND_ACC'),
+                    string(credentialsId: 'SE_SAND_SEC', variable: 'SE_SAND_SEC'),
+                    string(credentialsId: 'SE_SAND_PCC_URL', variable: 'SE_SAND_PCC_URL')
+                ]) {
+                    sh '''
+                    # Download the twistcli tool into the .defender directory
+                    sudo -u sm curl -k -u "$SE_SAND_ACC:$SE_SAND_SEC" --output ${WORKSPACE}/.defender/twistcli "$SE_SAND_PCC_URL/api/v1/util/twistcli"
+                    
+                    # Ensure twistcli is executable
+                    sudo -u sm chmod a+x ${WORKSPACE}/.defender/twistcli
+
+                    # List the contents of the .defender directory to check permissions
+                    ls -la ${WORKSPACE}/.defender
+                    '''
+                }
+            }
+        }
+
+        stage('Generate Deployment file') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'SE_SAND_ACC', variable: 'SE_SAND_ACC'),
+                    string(credentialsId: 'SE_SAND_SEC', variable: 'SE_SAND_SEC'),
+                    string(credentialsId: 'SE_SAND_PCC_URL', variable: 'SE_SAND_PCC_URL'),
+                    string(credentialsId: 'PCC_CLS_ADD', variable: 'PCC_CLS_ADD')
+                ]) {
+                    sh '''
+                    # Generate the deployment.yaml file for the Defender as the sm user
+                    sudo -u sm ${WORKSPACE}/.defender/twistcli defender install kubernetes --address "$SE_SAND_PCC_URL" --cluster-address "$PCC_CLS_ADD" --cluster aks01 --container-runtime containerd --namespace twistlock --output ${WORKSPACE}/.defender/deployment.yaml --user "$SE_SAND_ACC" --password "$SE_SAND_SEC"
+                    
+                    # List the contents of the .defender directory to check the deployment.yaml file
+                    ls -la ${WORKSPACE}/.defender
+                    '''
+                }
+            }
+        }
+
+        stage('Check Namespace Twistlock') {
+            steps {
+                script {
+                    sh '''
+                    # Check if the twistlock namespace exists, create if not
+                    if ! sudo -u sm kubectl get namespace twistlock; then
+                        sudo -u sm kubectl create namespace twistlock
+                    fi
+                    
+                    # List the namespaces to verify if twistlock namespace is created or exists
+                    sudo -u sm kubectl get namespaces
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy Defender to AKS') {
+            steps {
+                script {
+                    sh '''
+                   
+                    #sudo -u sm kubectl apply -f ${WORKSPACE}/.defender/deployment.yaml
+
+                    # Verify the status of the applied resources in the twistlock namespace
+                    sudo -u sm kubectl get pod -n twistlock
+                    '''
+                }
+            }
+        }
+    }
+}
+
+
