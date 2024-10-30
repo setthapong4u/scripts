@@ -3,7 +3,7 @@
 # Function to delete a message from the API
 delete_message() {
     local message=$1
-    curl -X DELETE -H "Content-Type: application/json" --insecure -d "{\"message\": \"$message\"}" "$base_url/home/delete"
+    curl -X DELETE -H "Content-Type: application/json" --insecure "$base_url/hello/$message"
 }
 
 # Prompt user for the base URL (default port 5000 for HTTP)
@@ -24,3 +24,4 @@ while true; do
 
     delete_message "$user_input"
 done
+
