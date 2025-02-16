@@ -63,3 +63,6 @@ sudo apt-mark hold kubelet kubeadm kubectl
 # Script completed
 echo "Setup complete. System is ready for Kubernetes 1.32 initialization."
 # curl -s https://raw.githubusercontent.com/setthapong4u/install-scripts/main/k8s-132.sh | bash
+# kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+# kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
+
